@@ -15,26 +15,8 @@ st.title("📝 Personal Note")
 # ---------------- Real-time Auto-refresh ----------------
 st_autorefresh(interval=2000, key="refresh")
 
-# ---------------- First-time Password ----------------
-if "unlocked" not in st.session_state:
-    if "note_password" in st.session_state:
-        st.session_state.unlocked = True
-    else:
-        st.session_state.unlocked = False
-
-if not st.session_state.unlocked:
-    password_input = st.text_input("Enter password:", type="password")
-    if st.button("Unlock"):
-        if password_input == "N+A":
-            st.session_state.unlocked = True
-            st.session_state.note_password = password_input
-            st.success("Unlocked ✅")
-        else:
-            st.error("Wrong password ❌")
-    st.stop()
-
 # ---------------- Note ID (acts as notebook link) ----------------
-note_id = st.text_input("Enter note name:", type="password")
+note_id = st.text_input("Enter note name (share this with others):")
 if not note_id:
     st.info("Enter a note name to access this Personal Note")
     st.stop()
