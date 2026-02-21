@@ -45,7 +45,7 @@ if msg:
     supabase.table("messages").insert({
         "note_id": note_id,
         "text": msg,
-        "created_at": datetime.utcnow(),
+        "created_at": datetime.utcnow().isoformat(),  # convert to string
         "seen_at": None,
         "sender": "me"
     }).execute()
@@ -63,7 +63,7 @@ for m in messages:
     with st.chat_message("📝 Personal Note"):
         st.write(m["text"])
     if not m.get("seen_at"):
-        supabase.table("messages").update({"seen_at": datetime.utcnow()}).eq("id", m["id"]).execute()
+    supabase.table("messages").update({"seen_at": datetime.utcnow().isoformat()}).eq("id", m["id"]).execute()
 
 # Delete old messages
 for m_id in to_delete:
