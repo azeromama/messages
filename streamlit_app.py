@@ -33,45 +33,30 @@ if not st.session_state.unlocked:
             st.error("Wrong password ❌")
     st.stop()
 
-# ---------------- Note ID (acts as chat room) ----------------
+# ---------------- Note ID (acts as notebook link) ----------------
 note_id = st.text_input("Enter note name:", type="password")
 if not note_id:
     st.info("Enter a note name to access this Personal Note")
     st.stop()
 
 # ---------------- Add Message / Note ----------------
-msg = st.chat_input("Write a message...")
-if msg:
-    supabase.table("messages").insert({
-        "note_id": note_id,
-        "text": msg,
-        "created_at": datetime.utcnow().isoformat(),  # convert to string
-        "seen_at": None,
-        "sender": "me"
-    }).execute()
+msg = st.text_area("Write in your note...")
+if st.button("Save"):
+    if msg:
+        supabase.table("messages").insert({
+            "note_id": note_id,
+            "text": msg,
+            "created_at": datetime.utcnow().isoformat()
+        }).execute()
+        st.success("Saved ✅")
 
-# ---------------- Display Messages ----------------
-now = datetime.utcnow()
+# ---------------- Display Notes ----------------
 messages = supabase.table("messages").select("*").eq("note_id", note_id).order("created_at").execute().data
-to_delete = []
 
 for m in messages:
-    # Auto-delete messages 5 min after viewing
-    if m.get("seen_at") and (now - m["seen_at"]).total_seconds() > 300:
-        to_delete.append(m["id"])
-        continue
-    with st.chat_message("📝 Personal Note"):
-        st.write(m["text"])
-    if not m.get("seen_at"):
-    supabase.table("messages").update({
-        "seen_at": datetime.utcnow().isoformat()
-    }).eq("id", m["id"]).execute()
-
-# Delete old messages
-for m_id in to_delete:
-    supabase.table("messages").delete().eq("id", m_id).execute()
+    st.markdown(f"- {m['text']}")
 
 # ---------------- Clear All ----------------
-if st.button("🧹 Clear All Messages"):
+if st.button("🧹 Clear All Notes"):
     supabase.table("messages").delete().eq("note_id", note_id).execute()
-    st.success("All messages cleared ✅")
+    st.success("All notes cleared ✅")
