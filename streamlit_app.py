@@ -63,7 +63,9 @@ for m in messages:
     with st.chat_message("📝 Personal Note"):
         st.write(m["text"])
     if not m.get("seen_at"):
-    supabase.table("messages").update({"seen_at": datetime.utcnow().isoformat()}).eq("id", m["id"]).execute()
+    supabase.table("messages").update({
+        "seen_at": datetime.utcnow().isoformat()
+    }).eq("id", m["id"]).execute()
 
 # Delete old messages
 for m_id in to_delete:
